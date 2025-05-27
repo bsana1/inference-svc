@@ -1,0 +1,113 @@
+{
+    "@odata.etag": "\"0x8DD416A673B8D2D\"",
+    "name": "py-rag-tutorial-ss",
+    "description": "Skillset to chunk documents and generate embeddings",
+    "skills": [
+      {
+        "@odata.type": "#Microsoft.Skills.Text.SplitSkill",
+        "name": "#1",
+        "description": "Split skill to chunk documents",
+        "context": "/document",
+        "defaultLanguageCode": "en",
+        "textSplitMode": "pages",
+        "maximumPageLength": 2000,
+        "pageOverlapLength": 500,
+        "maximumPagesToTake": 0,
+        "unit": "characters",
+        "inputs": [
+          {
+            "name": "text",
+            "source": "/document/content",
+            "inputs": []
+          }
+        ],
+        "outputs": [
+          {
+            "name": "textItems",
+            "targetName": "pages"
+          }
+        ]
+      },
+      {
+        "@odata.type": "#Microsoft.Skills.Text.AzureOpenAIEmbeddingSkill",
+        "name": "#2",
+        "description": "Skill to generate embeddings via Azure OpenAI",
+        "context": "/document/pages/*",
+        "resourceUri": "https://testazureopenai2.openai.azure.com",
+        "apiKey": "<redacted>",
+        "deploymentId": "text-embedding-3-large",
+        "dimensions": 1024,
+        "modelName": "text-embedding-3-large",
+        "inputs": [
+          {
+            "name": "text",
+            "source": "/document/pages/*",
+            "inputs": []
+          }
+        ],
+        "outputs": [
+          {
+            "name": "embedding",
+            "targetName": "text_vector"
+          }
+        ]
+      },
+      {
+        "@odata.type": "#Microsoft.Skills.Text.V3.EntityRecognitionSkill",
+        "name": "#3",
+        "description": "Skill to recognize entities in text",
+        "context": "/document/pages/*",
+        "categories": [
+          "Location"
+        ],
+        "defaultLanguageCode": "en",
+        "inputs": [
+          {
+            "name": "text",
+            "source": "/document/pages/*",
+            "inputs": []
+          }
+        ],
+        "outputs": [
+          {
+            "name": "locations",
+            "targetName": "locations"
+          }
+        ]
+      }
+    ],
+    "indexProjections": {
+      "selectors": [
+        {
+          "targetIndexName": "py-rag-tutorial-idx",
+          "parentKeyFieldName": "parent_id",
+          "sourceContext": "/document/pages/*",
+          "mappings": [
+            {
+              "name": "chunk",
+              "source": "/document/pages/*",
+              "inputs": []
+            },
+            {
+              "name": "text_vector",
+              "source": "/document/pages/*/text_vector",
+              "inputs": []
+            },
+            {
+              "name": "locations",
+              "source": "/document/pages/*/locations",
+              "inputs": []
+            },
+            {
+              "name": "title",
+              "source": "/document/metadata_storage_name",
+              "inputs": []
+            }
+          ]
+        }
+      ],
+      "parameters": {
+        "projectionMode": "skipIndexingParentDocuments"
+      }
+    }
+  }
