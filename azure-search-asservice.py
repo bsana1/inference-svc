@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 from azure.core.credentials import AzureKeyCredential
 from azure.search.documents import SearchClient
 from azure.search.documents.models import VectorizableTextQuery
-#from openai import AzureOpenAI
 import openai
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, ContentSettings
 from azure.core.exceptions import ResourceExistsError
@@ -10,22 +9,22 @@ import re
 import os
 import time
 import requests
+from dotenv import load_dotenv
 
+load_dotenv()
 
-indexer_name = "indexer-1738195231812"
-storage_blob_key = "AZURE_BLOB_KEY"
-storage_connection_string = "AZURE_BLOB_CONNECTION_STRING"
-container_name = "AZURE_BLOB_CONTAINER_NAME"
+# Set these in a .env file (see .env.example)
+indexer_name = os.environ["AZURE_SEARCH_INDEXER_NAME"]
+storage_connection_string = os.environ["AZURE_BLOB_CONNECTION_STRING"]
+container_name = os.environ["AZURE_BLOB_CONTAINER_NAME"]
 
-#ppe env
-indexName = "knowledge-inference-idx"
-azureAiSearchEndpoint = "AZURE_AI_SEARCH_ENDPOINT"
-azureAiSearchKey = "AZURE_AI_SEARCH_KEY"
+indexName = os.environ["AZURE_SEARCH_INDEX_NAME"]
+azureAiSearchEndpoint = os.environ["AZURE_AI_SEARCH_ENDPOINT"]
+azureAiSearchKey = os.environ["AZURE_AI_SEARCH_KEY"]
 
-# don't change - common RAG
-azureOpenAiEndpoint = "AZURE_OPEN_AI_ENDPOINT"
-azureOpenAiKey = "AZURE_OPEN_AI_KEY"
-openAiApiKey = "OPEN_AI_API_KEY"
+azureOpenAiEndpoint = os.environ["AZURE_OPEN_AI_ENDPOINT"]
+azureOpenAiKey = os.environ["AZURE_OPEN_AI_KEY"]
+openAiApiKey = os.environ["OPEN_AI_API_KEY"]
 deployment_name = "gpt-4o"
 
 # Provide instructions to the model
@@ -61,8 +60,6 @@ search_client = SearchClient(
     index_name=indexName,
     credential=AzureKeyCredential(azureAiSearchKey)
 )
-
-os
 
 def upload_large_file_to_blob(file_path, chunk_size_mb=4):
     # Connection to the BlobServiceClient

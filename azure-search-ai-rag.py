@@ -1,15 +1,20 @@
 # Import necessary libraries
+import os
+
 from azure.core.credentials import AzureKeyCredential
 from azure.search.documents import SearchClient
 from azure.search.documents.models import VectorizableTextQuery
+from dotenv import load_dotenv
 from openai import AzureOpenAI
 
-# Replace with your own endpoint and API key
-azureAiSearchEndpoint = "AZURE_SEARCH_URL"
-azureAiSearchKey = "AZURE_SEARHC_KEY"
+load_dotenv()
 
-azureOpenAiendpoint = "AZURE_OPEN_AI_URL"
-azureOpenAiKey = "AZURE_OPEN_AI_KEY"
+# Set these in a .env file (see .env.example)
+azureAiSearchEndpoint = os.environ["AZURE_SEARCH_URL"]
+azureAiSearchKey = os.environ["AZURE_SEARCH_KEY"]
+
+azureOpenAiendpoint = os.environ["AZURE_OPEN_AI_URL"]
+azureOpenAiKey = os.environ["AZURE_OPEN_AI_KEY"]
 deployment_name = "gpt-4o"
 
 # Provide instructions to the model

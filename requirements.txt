@@ -1,0 +1,7 @@
+azure-core
+azure-search-documents
+azure-storage-blob
+flask
+openai
+python-dotenv
+requests
